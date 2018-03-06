@@ -1,5 +1,11 @@
 *.log
 
+config.py
+runtime.yaml
+client_secrets.json
+
 *config.py
 *runtime.yaml
 *client_secrets.json
+
+*.json
