@@ -1,5 +1,0 @@
-*.log
-
-*config.py
-*runtime.yaml
-*client_secrets.json
