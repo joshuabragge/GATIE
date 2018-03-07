@@ -3,18 +3,11 @@ import pandas as pd
 import report_manager
 import report_handler
 import email_handler
-import web_handler
 
 
 test = True
 
-analytics = report_manager.initialize_analyticsreporting()
 start_date, end_date = report_manager.create_date_range(start_date=None, end_date=None)
-weekly_views = report_manager.get_weekly_views(analytics, start_date, end_date)
-weekly_applicants = report_manager.get_weekly_applicants(analytics, start_date, end_date)
-
-weekly_applicants.to_csv('weekly_applicants.csv',index=False)
-weekly_views.to_csv('weekly_views.csv',index=False)
 
 weekly_applicants = pd.read_csv('weekly_applicants.csv')
 weekly_views = pd.read_csv('weekly_views.csv')
@@ -22,15 +15,7 @@ weekly_views = pd.read_csv('weekly_views.csv')
 weekly_applicants = report_handler.ready_frame(weekly_applicants, types='applicants')
 weekly_views = report_handler.ready_frame(weekly_views, types='views')
 
-
 weekly = report_handler.merge(weekly_views,weekly_applicants)
-
-assert(len(weekly.shape) > 0)
-
-web_pages = report_handler.create_web_pages(weekly)
-web_pages['Details'] = web_pages['Page'].apply(lambda x: web_handler.get_stuff_from_url(x))
-
-web_pages.to_csv('web_pages.csv', index=False)
 
 web_pages = pd.read_csv('web_pages.csv')
 

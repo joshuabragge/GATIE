@@ -1,8 +1,12 @@
 import pandas as pd
 
 
-
 def ready_frame(df, types='Applicants'):
+    """
+    :param df: pd.DataFrame
+    :param types: str Applicants or Views
+    :return: pd.DataFrame
+    """
     
     df = df[df['ga:previousPagePath'].str.contains('jobid')]
     df['jobid'] = df['ga:previousPagePath'].apply(lambda x: x.split('jobid=')[1].split('_')[0])
@@ -25,14 +29,17 @@ def ready_frame(df, types='Applicants'):
    
     return df
 
+
 def drop_y(df):
     to_drop = [x for x in df if x.endswith('_y')]
     df.drop(to_drop, axis=1, inplace=True)
+
 
 def rename_x(df):
     for col in df:
         if col.endswith('_x'):
             df.rename(columns={col:col.rstrip('_x')}, inplace=True)
+
 
 def merge(weekly_views, weekly_applicants):
     weekly = weekly_views.merge(weekly_applicants, on='JobId', how='outer')
@@ -40,11 +47,12 @@ def merge(weekly_views, weekly_applicants):
     rename_x(weekly)
     return weekly
 
+
 def create_web_pages(weekly):
     """
-    weekly: pd.DataFrame with column called Page
-    ex. for-job-seekers/search-jobs/?jobid=13241_civil-or-construction-engineering-technologist-3241-ab-calgary-area
-    returns: pd.Series
+    :param weekly: pd.DataFrame with column called Page
+    example: for-job-seekers/search-jobs/?jobid=13241_civil-or-construction-engineering-technologist-3241-ab-calgary-area
+    :return: pd.Series
     """
     web_pages = pd.DataFrame(weekly['Page'].unique()).dropna()
     web_pages = 'http://www.theheadhunters.ca' + web_pages
@@ -53,7 +61,7 @@ def create_web_pages(weekly):
 
 
 def ready_recruiter_results(recruiter_results):
-    recruiter_results = recruiter_results.groupby([Job,'Source']).sum().fillna(0)
+    recruiter_results = recruiter_results.groupby(['Job', 'Source']).sum().fillna(0)
     recruiter_results['Applicants/Views'] = recruiter_results['Applicants']/recruiter_results['Views']
     recruiter_results['Applicants/Views'] = recruiter_results['Applicants/Views'].mul(100).astype(str).add('%')
     return recruiter_results

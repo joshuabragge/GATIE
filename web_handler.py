@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+import time
+import numpy as np
 
 
 def get_stuff_from_url(web_url):
@@ -10,7 +12,7 @@ def get_stuff_from_url(web_url):
         email = create_email(name)
         title = get_title_from_soup(soup)
         row = name + '|' + email + '|' + title
-        time.sleep(0.1)
+        time.sleep(0.5)
         return row
     except:
         return np.nan
