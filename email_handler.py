@@ -1,5 +1,6 @@
 import pandas as pd
 import requests
+import config
 
 def create_message(name, html_frame):
     message = '''<p>
@@ -25,21 +26,24 @@ def create_message(name, html_frame):
 
 
 def html_cleanup(html_frame):
-    
     html_frame = html_frame.replace("\n", "")
-    
+
     h2 = '<h2>&nbsp;</h2>'
     h2_replace = ''
     html_frame = html_frame.replace(h2, h2_replace)
-    
+
     pre = '<pre>&nbsp;</pre>'
     pre_replace = ''
     html_frame = html_frame.replace(pre, pre_replace)
-    
+
     pre_2 = '<pre>    </pre>'
     pre_2_replace = ''
     html_frame = html_frame.replace(pre_2, pre_2_replace)
-    
+
+    header = '<th></th>      <th></th>      <th>Views</th>      <th>JobId</th>      <th>Applicants</th>      <th>Applicants/Views</th>    </tr>    <tr>      <th>Job</th>      <th>Source</th>'
+    header_replace = '<th>Job</th>      <th>Source</th>      <th>Views</th>      <th>JobId</th>      <th>Applicants</th>      <th>Applicants/Views</th>    </tr>    <tr>      <th></th>      <th></th>'
+    html_frame = html_frame.replace(header, header_replace)
+
     return html_frame
 
 
@@ -110,7 +114,7 @@ def prepare_reporting_email(to, subject, html):
 
 def send_email(data):
     return requests.post(
-                email_base_url,
-                auth=("api", email_api_key),
+                config.email_base_url,
+                auth=("api", config.email_api_key),
                 data=data)
 

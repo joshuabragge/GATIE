@@ -3,25 +3,26 @@ from oauth2client.service_account import ServiceAccountCredentials
 import datetime
 import pandas as pd
 import time
-import numpy as np
+
 
 SCOPES = ['https://www.googleapis.com/auth/analytics.readonly']
 KEY_FILE_LOCATION = 'client_secrets.json'
 VIEW_ID = '35662697'
 
+
 def initialize_analyticsreporting():
-	"""Initializes an Analytics Reporting API V4 service object.
+    """Initializes an Analytics Reporting API V4 service object.
 
-	Returns:
-	An authorized Analytics Reporting API V4 service object.
-	"""
-	credentials = ServiceAccountCredentials.from_json_keyfile_name(
-	KEY_FILE_LOCATION, SCOPES)
+    Returns:
+    An authorized Analytics Reporting API V4 service object.
+    """
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+    KEY_FILE_LOCATION, SCOPES)
 
-	# Build the service object.
-	analytics = build('analyticsreporting', 'v4', credentials=credentials)
+    # Build the service object.
+    analytics = build('analyticsreporting', 'v4', credentials=credentials)
 
-	return analytics
+    return analytics
 
 
 def get_applications_report(analytics, start_date='7daysAgo', end_date='today'):
@@ -78,94 +79,95 @@ def get_applications_report(analytics, start_date='7daysAgo', end_date='today'):
   ).execute()
 
 def get_views_report(analytics, start_date='7daysAgo', end_date='today'):
-	  """Queries the Analytics Reporting API V4.
+      """Queries the Analytics Reporting API V4.
 
-	  Args:
-	    analytics: An authorized Analytics Reporting API V4 service object.
-	  Returns:
-	    The Analytics Reporting API V4 response.
-	  """
-	  return analytics.reports().batchGet(
-	      body={
-		'reportRequests': [
-		{
-		  'viewId': VIEW_ID,
-		  'dateRanges': [{'startDate': start_date, 'endDate': end_date}],
-		  'metrics': [{'expression': 'ga:pageviews'}],
-		  'dimensions': [{'name': 'ga:previousPagePath'}, 
-		                 {'name': 'ga:pagePath'}, 
-		                 {'name' : 'ga:source'}, 
-		                 {"name": "ga:segment"},
-		                ],
-	    "segments":[
-	    {
-	      "dynamicSegment":
-	      {
-		"name": "ApplicationSubbmited",
-		"userSegment":
-		{
-		  "segmentFilters":[
-		  {
-		    "simpleSegment":
-		    {
-		      "orFiltersForSegment":
-		      {
-		        "segmentFilterClauses": [
-		        {
-		          "dimensionFilter":
-		          {
-		            "dimensionName":"ga:pagePath",
-		            "operator":"PARTIAL",
-		            "expressions":["jobid="]
-		          }
-		        }]
-		      }
-		    }
-		  }]
-		}
-	      }
-	    }
-	    ]
-		}]
-	      }
-	  ).execute()
+      Args:
+        analytics: An authorized Analytics Reporting API V4 service object.
+      Returns:
+        The Analytics Reporting API V4 response.
+      """
+      return analytics.reports().batchGet(
+          body={
+        'reportRequests': [
+        {
+          'viewId': VIEW_ID,
+          'dateRanges': [{'startDate': start_date, 'endDate': end_date}],
+          'metrics': [{'expression': 'ga:pageviews'}],
+          'dimensions': [{'name': 'ga:previousPagePath'},
+                         {'name': 'ga:pagePath'},
+                         {'name' : 'ga:source'},
+                         {"name": "ga:segment"},
+                        ],
+        "segments":[
+        {
+          "dynamicSegment":
+          {
+        "name": "ApplicationSubbmited",
+        "userSegment":
+        {
+          "segmentFilters":[
+          {
+            "simpleSegment":
+            {
+              "orFiltersForSegment":
+              {
+                "segmentFilterClauses": [
+                {
+                  "dimensionFilter":
+                  {
+                    "dimensionName":"ga:pagePath",
+                    "operator":"PARTIAL",
+                    "expressions":["jobid="]
+                  }
+                }]
+              }
+            }
+          }]
+        }
+          }
+        }
+        ]
+        }]
+          }
+      ).execute()
 
 
 def response_to_frame(response, start_date='2018-02-01', end_date='2018-02-02'):
     list = []
     # get report data
     for report in response.get('reports', []):
-	# set column headers
-	columnHeader = report.get('columnHeader', {})
-	dimensionHeaders = columnHeader.get('dimensions', [])
-	metricHeaders = columnHeader.get('metricHeader', {}).get('metricHeaderEntries', [])
-	rows = report.get('data', {}).get('rows', [])
+    # set column headers
+        columnHeader = report.get('columnHeader', {})
+        dimensionHeaders = columnHeader.get('dimensions', [])
+        metricHeaders = columnHeader.get('metricHeader', {}).get('metricHeaderEntries', [])
+        rows = report.get('data', {}).get('rows', [])
 
-	for row in rows:
-	    # create dict for each row
-	    dict = {}
-	    dimensions = row.get('dimensions', [])
-	    dateRangeValues = row.get('metrics', [])
+        for row in rows:
+            # create dict for each row
+            dict = {}
+            dimensions = row.get('dimensions', [])
+            dateRangeValues = row.get('metrics', [])
 
-	    # fill dict with dimension header (key) and dimension value (value)
-	    for header, dimension in zip(dimensionHeaders, dimensions):
-		dict[header] = dimension
+            # fill dict with dimension header (key) and dimension value (value)
+            for header, dimension in zip(dimensionHeaders, dimensions):
+                dict[header] = dimension
 
-	    # fill dict with metric header (key) and metric value (value)
-	    for i, values in enumerate(dateRangeValues):
-		for metric, value in zip(metricHeaders, values.get('values')):
-		    #set int as int, float a float
-		    if ',' in value or ',' in value:
-		        dict[metric.get('name')] = float(value)
-		    else:
-		        dict[metric.get('name')] = int(value)
+            # fill dict with metric header (key) and metric value (value)
+            for i, values in enumerate(dateRangeValues):
+                for metric, value in zip(metricHeaders, values.get('values')):
+                    # set int as int, float a float
+                    if ',' in value or ',' in value:
+                        dict[metric.get('name')] = float(value)
+                    else:
+                        dict[metric.get('name')] = int(value)
 
-	    list.append(dict)
+            list.append(dict)
 
     df = pd.DataFrame(list)
     df['start_date'] = start_date
     df['end_date'] = end_date
     return df
+
 
 def get_weekly_views(analytics, start_date, end_date):
     """
@@ -185,7 +187,6 @@ def get_weekly_views(analytics, start_date, end_date):
         end_date = report_date
         start_date = report_date
 
-        #analytics = initialize_analyticsreporting()
         response = get_views_report(analytics, start_date=start_date, end_date=end_date)
         tf = response_to_frame(response, start_date=start_date, end_date=end_date)
         
@@ -195,9 +196,9 @@ def get_weekly_views(analytics, start_date, end_date):
         except:
             print('Error grabbing vies for range:', start_date, end_date)
             time.sleep(1)
-            continue # exit loop
+            continue  # exit loop
             
-        df = pd.concat([df,tf])
+        df = pd.concat([df, tf])
 
         print('Grabbing views for range:', start_date, end_date)
         time.sleep(1)
@@ -210,7 +211,7 @@ def get_weekly_applicants(analytics, start_date, end_date):
     end_date: datetime
     """
     initial_date = start_date
-    delta = finish_date - start_date
+    delta = end_date - start_date
     days_between = delta.days
     
     df = pd.DataFrame()
@@ -222,7 +223,6 @@ def get_weekly_applicants(analytics, start_date, end_date):
         end_date = report_date
         start_date = report_date
 
-        #analytics = initialize_analyticsreporting()
         response = get_applications_report(analytics, start_date=start_date, end_date=end_date)
         tf = response_to_frame(response, start_date=start_date, end_date=end_date)
         
@@ -242,13 +242,15 @@ def get_weekly_applicants(analytics, start_date, end_date):
 
 def create_date_range(start_date=None, end_date=None):
     """
-    start_date: str date in '%Y-%m-%d' or None if td - 7 d
-    end_date: str date in '%Y-%m-%d' or None if TD
-    returns: datetime start_date, end_date 
+    :param start_date:  str date in '%Y-%m-%d' or None if td - 7 d
+    :param end_date: str date in '%Y-%m-%d' or None if TD
+    :return: str datetime start_date, end_date
     """
     if end_date is None:
         end_date = datetime.datetime.now()
+        finish_date = end_date
     else:
+        finish_date = end_date
         end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
     if start_date is None:
         start_date = finish_date - datetime.timedelta(weeks=1)
