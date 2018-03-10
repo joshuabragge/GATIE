@@ -1,3 +1,5 @@
+
+from ruamel.yaml import YAML
 import pandas as pd
 
 import report_manager
@@ -6,7 +8,15 @@ import email_handler
 import web_handler
 
 
+
+
 test = True
+
+class ProcessManager():
+    def __init__(self):
+        yaml = YAML()
+        self.config = yaml.load('../runtime.yaml')
+        self.env = self._shared_params['env']
 
 analytics = report_manager.initialize_analyticsreporting()
 start_date, end_date = report_manager.create_date_range(start_date=None, end_date=None)
