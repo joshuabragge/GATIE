@@ -1,3 +1,25 @@
 
-test: True
-testing: True
+
+test:
+    analytics:
+        get_analytics: True
+        start_date: None # YYYY-mm-dd
+        end_date: None # YYYY-mm-dd
+        recruiter: Danielle Bragge
+    emails:
+        send_emails: False
+        recepiants: joshuabragge@gmail.com
+        sent_from_addr: reporting@bragge.ca
+        sent_from_name: Weekly Job Report
+
+prod:
+    analytics:
+        get_analytics: True
+        start_date: None
+        end_date: None
+        recruiter: None
+    emails:
+        send_emails: True
+        recepiant: None
+        sent_from_addr: reporting@bragge.ca
+        sent_from_name: Weekly Job Report
