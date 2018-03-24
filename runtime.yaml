@@ -11,6 +11,9 @@ test:
         recepiants: joshuabragge@gmail.com
         sent_from_addr: reporting@bragge.ca
         sent_from_name: Weekly Job Report
+    results:
+        save: True
+        location: results
 
 prod:
     analytics:
@@ -23,3 +26,6 @@ prod:
         recepiant: None
         sent_from_addr: reporting@bragge.ca
         sent_from_name: Weekly Job Report
+    results:
+        save: True
+        location: results
