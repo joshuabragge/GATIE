@@ -24,52 +24,73 @@ class ProcessManager(Env):
         if self.save:
             self.save_web_report()
 
+        self.parse_web_pages()
+
+        if self.save:
+            self.save_web_report()
+
+        self.add_emails_to_reports()
+
+        if self.save:
+            self.self.save_complete_reports()
+
+        self.prepare_emails()
+
+        self.send_emails()
 
 
 
-
+self.get_analytics_reports()
 analytics = report_manager.initialize_analyticsreporting()
 start_date, end_date = report_manager.create_date_range(start_date=None, end_date=None)
 weekly_views = report_manager.get_weekly_views(analytics, start_date, end_date)
 weekly_applicants = report_manager.get_weekly_applicants(analytics, start_date, end_date)
 
+save_analytics_reports()
 weekly_applicants.to_csv('weekly_applicants.csv',index=False)
 weekly_views.to_csv('weekly_views.csv',index=False)
 
-weekly_applicants = pd.read_csv('weekly_applicants.csv')
-weekly_views = pd.read_csv('weekly_views.csv')
+#weekly_applicants = pd.read_csv('weekly_applicants.csv')
+#weekly_views = pd.read_csv('weekly_views.csv')
 
-
+self.clean_reports()
 weekly_applicants = report_handler.ready_frame(weekly_applicants, types='applicants')
 weekly_views = report_handler.ready_frame(weekly_views, types='views')
 weekly = report_handler.merge(weekly_views, weekly_applicants)
 assert(len(weekly.shape) > 0)
 web_pages = report_handler.create_web_pages(weekly)
 
-
+self.transform_reports_for_web_query()
 web_pages['Details'] = web_pages['Page'].apply(lambda x: web_handler.get_stuff_from_url(x))
+web_pages[['Name', 'Email', 'Job']] = web_pages['Details'].str.split('|', expand=True)
+web_pages = web_pages.drop('Details', axis=1)
+
+self.save_web_report()
 web_pages.to_csv('web_pages.csv', index=False)
-web_pages = pd.read_csv('web_pages.csv')
+#web_pages = pd.read_csv('web_pages.csv')
+
+self.parse_web_pages()
+web_pages['Page'] = web_pages['Page'].apply(lambda x: x.replace('http://www.theheadhunters.ca', ''))
 
 
 -----
 
-web_pages[['Name', 'Email', 'Job']] = web_pages['Details'].str.split('|', expand=True)
-web_pages = web_pages.drop('Details', axis=1)
-web_pages['Page'] = web_pages['Page'].apply(lambda x: x.replace('http://www.theheadhunters.ca', ''))
+self.add_emails_to_reports()
 results = weekly.merge(web_pages, on='Page')
 results = results.dropna(subset=['Email'])
 results['Page'] = 'http://www.theheadhunters.ca' + results['Page']
 results['Views'] = results['Views'].astype(int)
 results['Applicants'] = results['Applicants'].fillna(0).astype(int)
 
+self.save_complete_reports()
 results.to_csv('job_activity_report.csv', index=False)
-results = pd.read_csv('job_activity_report.csv')
+#results = pd.read_csv('job_activity_report.csv')
 
+self.prepare_emails()
 names = results['Name'].unique()
-
 subject = email_handler.prepare_subject(start_date, end_date)
 
+self.send_emails()
 for name in names:
     name = 'Danielle Bragge'
     recruiter_results = results[results['Name'] == name]
@@ -82,5 +103,5 @@ for name in names:
     email_message = email_handler.create_message(first_name, html_frame)
     email = email_handler.prepare_reporting_email(to='joshuabragge@gmail.com', subject=subject, html=email_message)
     email_handler.send_email(email)
-    if test:
+    if self.env == 'test':
         break
