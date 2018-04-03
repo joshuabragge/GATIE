@@ -8,6 +8,7 @@ def main():
     parser = argparse.ArgumentParser(description='Read google analytics and send results to recruiters')
     parser.add_argument('-e', '--env', choices=['test', 'prod'], help='test or prod', default='test')
     parser.add_argument('-v', '--verbosity', help="increase verbosity for troubleshooting", action='store_true')
+    parser.add_argument('-r', '--recruiter', help="specify a single recruiter to act upon")
     args = parser.parse_args()
 
     env = environment.Env()
