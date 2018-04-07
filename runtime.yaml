@@ -3,14 +3,14 @@
 test:
     analytics:
         get_analytics: True
-        start_date: None # YYYY-mm-dd
-        end_date: None # YYYY-mm-dd
-        recruiter: [Danielle Bragge, Patti Babyn]
+        start_date: # YYYY-mm-dd
+        end_date:  # YYYY-mm-dd
+        recruiter:
     emails:
         send_emails: False
-        recepiants: joshuabragge@gmail.com
-        sent_from_addr: reporting@bragge.ca
-        sent_from_name: Weekly Job Report
+        recipients: [joshuabragge@gmail.com]
+        sent_from_address: josh@bragge.ca
+        sent_from_name: Ad Impressions
     results:
         save: True
         location: results
@@ -18,14 +18,14 @@ test:
 prod:
     analytics:
         get_analytics: True
-        start_date: None
-        end_date: None
+        start_date:
+        end_date:
         recruiter: None
     emails:
         send_emails: True
-        recepiant: None
-        sent_from_addr: reporting@bragge.ca
-        sent_from_name: Weekly Job Report
+        recipients: []
+        sent_from_address: josh@bragge.ca
+        sent_from_name: Ad Impressions
     results:
         save: True
         location: results
