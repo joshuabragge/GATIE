@@ -5,7 +5,7 @@ test:
         get_analytics: True
         start_date: None # YYYY-mm-dd
         end_date: None # YYYY-mm-dd
-        recruiter: Danielle Bragge
+        recruiter: [Danielle Bragge, Patti Babyn]
     emails:
         send_emails: False
         recepiants: joshuabragge@gmail.com
