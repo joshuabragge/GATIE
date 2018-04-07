@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 def ready_frame(df, types='Applicants'):
@@ -62,6 +63,9 @@ def create_web_pages(weekly):
 
 def ready_recruiter_results(recruiter_results):
     recruiter_results = recruiter_results.groupby(['Job', 'Source']).sum().fillna(0)
+    # if applicants > views lower the applicants to match the view amount
+    # so you don't end up with 120% applicant to view ratio // makes no sense
+    recruiter_results['Applicants'] = np.where(recruiter_results['Views'] > recruiter_results['Applicants'], recruiter_results['Applicants'], recruiter_results['Views'])
     recruiter_results['Applicants/Views'] = recruiter_results['Applicants']/recruiter_results['Views']
-    recruiter_results['Applicants/Views'] = recruiter_results['Applicants/Views'].mul(100).astype(str).add('%')
+    recruiter_results['Applicants/Views'] = recruiter_results['Applicants/Views'].mul(100).round().astype(int).astype(str).add('%')
     return recruiter_results
