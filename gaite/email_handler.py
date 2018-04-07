@@ -2,22 +2,36 @@ import requests
 from secrets import config
 
 
-def create_message(name, html_frame):
-    message = '''<p>
-    <span style="font-family: calibri, sans-serif; font-size: 11pt;">Hi $name,</span>
-</p>
-<p>
-    <span style="font-family: calibri, sans-serif; font-size: 11pt;">Welcome to your weekly job activity report: </span> 
-    $html_frame 
-</p>
-<p>
-    <span style="font-family: calibri, sans-serif; font-size: 11pt;">Happy Hunting! </span>
-</p>
-<p>
-    <span style="font-family: calibri, sans-serif; font-size 8pt;">This report details the number of views and the approximate number of applicants for jobs posted on theheadhunters.ca. Please note, if a job is no longer on the headhunters website, the statistics will not be included. All information has been pulled from Google Analytics. Please send all comments, suggestions or errors to josh@bragge.ca</span>
-        <br />
-    </span>
-</p>'''
+def create_message(name, html_frame, env='test'):
+    if env == 'test':
+        message = '''<p>
+        <span style="font-family: calibri, sans-serif; font-size: 11pt;">Hi $name,</span>
+    </p><p>
+        <span style="font-family: calibri, sans-serif; font-size: 11pt;">Welcome to your weekly job impression report: </span> 
+        $html_frame 
+    </p> <p>
+        <span style="font-family: calibri, sans-serif; font-size: 11pt;">Happy Hunting! </span>
+    </p><p>
+        <span style="font-family: calibri, sans-serif; font-size 8pt;">Congratulations, you've been chosen for beta testing! This report details the approximate number of views and applicants for jobs posted on theheadhunters.ca. Please note, if a job is no longer on the headhunters website, the statistics will not be included. All information has been pulled from Google Analytics. Please send all comments, suggestions or errors to josh@bragge.ca</span>
+            <br />
+        </span>
+    </p>'''
+    else:
+        message = '''<p>
+                <span style="font-family: calibri, sans-serif; font-size: 11pt;">Hi $name,</span>
+            </p>
+            <p>
+                <span style="font-family: calibri, sans-serif; font-size: 11pt;">Welcome to your weekly job impression report: </span> 
+                $html_frame 
+            </p>
+            <p>
+                <span style="font-family: calibri, sans-serif; font-size: 11pt;">Happy Hunting! </span>
+            </p>
+            <p>
+                <span style="font-family: calibri, sans-serif; font-size 8pt;">This report details the approximate number of views and applicants for jobs posted on theheadhunters.ca. Please note, if a job is no longer on the headhunters website, the statistics will not be included. All information has been pulled from Google Analytics. Please send all comments, suggestions or errors to josh@bragge.ca</span>
+                    <br />
+                </span>
+            </p>'''
     message = message.replace("\n", "<pre>")
     message = message.replace("\t", "")
     message = message.replace("$name", name)
@@ -80,7 +94,7 @@ def to_html(df, title=''):
         font-size: 90%;
     }
     table tbody tr:hover {
-        background-color: #dddddd;
+        background-color: #888888;
     }
     .wide {
         width: 90%; 
@@ -98,19 +112,22 @@ def to_html(df, title=''):
     result = html_cleanup(result)
     return result
 
+
 def prepare_subject(start_date,end_date):
     date = '{} - {}'.format(start_date.strftime('%b. %d'), end_date.strftime('%b. %d'))
-    subject = 'Job Activity Report {}'.format(date)
+    subject = 'Impression Report {}'.format(date)
     return subject
 
-def prepare_reporting_email(to, subject, html):
-    to = ["joshuabragge@gmail.com"]
-    from_ = "Job Activity Reporting <reporting@bragge.ca>"
-    data={"from": from_,
-          "to": to,
-          "subject": subject,
-          "html": html}
+
+def prepare_reporting_email(to_address, from_address, subject, html):
+    to_address = to_address
+    from_address = from_address
+    data = {"from": from_address,
+              "to": to_address,
+              "subject": subject,
+              "html": html}
     return data
+
 
 def send_email(data):
     return requests.post(
