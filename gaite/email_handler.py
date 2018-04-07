@@ -1,6 +1,6 @@
-import pandas as pd
 import requests
-import config
+from secrets import config
+
 
 def create_message(name, html_frame):
     message = '''<p>

@@ -1,12 +1,15 @@
+import os
+
 from apiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
+
 import datetime
 import pandas as pd
 import time
 
 
 SCOPES = ['https://www.googleapis.com/auth/analytics.readonly']
-KEY_FILE_LOCATION = 'client_secrets.json'
+KEY_FILE_LOCATION = os.path.join('secrets', 'client_secrets.json')
 VIEW_ID = '35662697'
 
 
