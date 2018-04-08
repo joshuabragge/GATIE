@@ -1,3 +1,31 @@
 
-test: True
-testing: True
+
+test:
+    analytics:
+        get_analytics: True
+        start_date: # YYYY-mm-dd
+        end_date:  # YYYY-mm-dd
+        recruiter:
+    emails:
+        send_emails: False
+        recipients: [joshuabragge@gmail.com]
+        sent_from_address: josh@bragge.ca
+        sent_from_name: Ad Impressions
+    results:
+        save: True
+        location: results
+
+prod:
+    analytics:
+        get_analytics: True
+        start_date:
+        end_date:
+        recruiter: None
+    emails:
+        send_emails: True
+        recipients: []
+        sent_from_address: josh@bragge.ca
+        sent_from_name: Ad Impressions
+    results:
+        save: True
+        location: results

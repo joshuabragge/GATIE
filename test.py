@@ -1,9 +1,6 @@
 import pandas as pd
 
-import report_manager
-import report_handler
-import email_handler
-
+from gaite import email_handler, report_manager, report_handler
 
 test = True
 
@@ -15,7 +12,7 @@ weekly_views = pd.read_csv('weekly_views.csv')
 weekly_applicants = report_handler.ready_frame(weekly_applicants, types='applicants')
 weekly_views = report_handler.ready_frame(weekly_views, types='views')
 
-weekly = report_handler.merge(weekly_views,weekly_applicants)
+weekly = report_handler.merge(weekly_views, weekly_applicants)
 
 web_pages = pd.read_csv('web_pages.csv')
 
