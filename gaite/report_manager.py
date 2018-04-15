@@ -197,13 +197,13 @@ def get_weekly_views(analytics, start_date, end_date):
         try:
             tf = tf[tf['ga:pagePath'].str.contains('jobid=')]
         except:
-            print('Error grabbing vies for range:', start_date, end_date)
+            # print('Error grabbing vies for range:', start_date, end_date)
             time.sleep(1)
             continue  # exit loop
             
         df = pd.concat([df, tf])
 
-        print('Grabbing views for range:', start_date, end_date)
+        # print('Grabbing views for range:', start_date, end_date)
         time.sleep(1)
         
     return df
@@ -242,6 +242,7 @@ def get_weekly_applicants(analytics, start_date, end_date):
         time.sleep(1)
         
     return df
+
 
 def create_date_range(start_date=None, end_date=None):
     """

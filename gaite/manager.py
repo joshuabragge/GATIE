@@ -87,27 +87,28 @@ class ProcessManager(Env):
         self.all_recipients = None
 
     def trigger(self):
-        self.get_analytics_reports()
+        #self.get_analytics_reports()
 
-        if self.save:
-            self.save_analytics_reports()
+        #if self.save:
+            #self.save_analytics_reports()
 
-        report = self.ready_reports()
-        web_page_details = self.get_report_details(report)
+        #report = self.ready_reports()
+        #web_page_details = self.get_report_details(report)
 
-        if self.save:
-            self.save_web_page_details()
+        #if self.save:
+         #   self.save_web_page_details()
 
-        final_report = self.add_report_details(report, web_page_details)
+        #final_report = self.add_report_details(report, web_page_details)
 
-        if self.save:
-            self.save_complete_reports()
+        #if self.save:
+            #self.save_complete_reports()
 
-        # final_report = self.load_complete_report()
+        final_report = self.load_complete_report()
 
         self.prepare_emails()
 
         self.send_emails(final_report)
+        self.logger.logger.info('Operation complete. Waiting for trigger to reset')
 
     def get_analytics_reports(self):
         """
@@ -265,6 +266,7 @@ class ProcessManager(Env):
         self.logger.logger.info("Sleeping for {} seconds".format(sleeper))
         delivery_day = self.delivery_time[0]
         delivery_hour = self.delivery_time[1]
+        reset_day = delivery_day + 1
         self.logger.logger.info("Delivery on {} at {}".format(delivery_day, delivery_hour))
 
         while True:
@@ -284,10 +286,11 @@ class ProcessManager(Env):
                         pass
 
                 if report_sent is True:
-                    if now.weekday() == delivery_day + 1:
+                    if now.weekday() == reset_day:
                         self.logger.logger.info("Resetting trigger...")
                         report_sent = False
                 time.sleep(sleeper)
+
             except (KeyboardInterrupt, SystemExit):
                 self.logger.logger.info("Exiting program due to KeyBoardInterrupt")
                 raise
