@@ -1,5 +1,7 @@
 
 from ruamel.yaml import YAML
+import datetime
+import time
 import pandas as pd
 
 from gaite import email_handler
@@ -9,6 +11,11 @@ from gaite import report_manager
 
 from gaite.environment import Env
 
+# todo
+# confirm email addresses when the recepiant is blank
+# send master copy to management
+# add failsafe function
+# logger
 
 class ProcessManager(Env):
     def __init__(self, env):
@@ -60,7 +67,7 @@ class ProcessManager(Env):
         self.subject = None
         self.all_recipients = None
 
-    def run(self):
+    def trigger(self):
         #self.get_analytics_reports()
 
         #if self.save:
@@ -185,14 +192,14 @@ class ProcessManager(Env):
         for name in self.all_recipients:
             employee = None
 
-            if self.active_recruiters is None:
+            if len(self.active_recruiters) == 0:
                 employee = name
             else:
                 for active_recruiter in self.active_recruiters:
 
                     if active_recruiter == name:
                         employee = name
-                        print(active_recruiter, employee, name)
+                        break
                     else:
                         employee = None
 
@@ -212,8 +219,7 @@ class ProcessManager(Env):
                     to_address = [email_address]
                 else:
                     to_address = self.to_address
-                print(email_address)
-                print(email_message)
+
                 email = email_handler.prepare_reporting_email(to_address=to_address,
                                                               from_address=self.from_address,
                                                               subject=self.subject,
@@ -222,3 +228,30 @@ class ProcessManager(Env):
                     email_handler.send_email(email)
                     print('sent email')
                 print('email delivered to', to_address, employee)
+
+    def run(self):
+        # time controller
+        report_sent = False
+        while True:
+            now = datetime.datetime.now()
+
+            if report_sent is False:
+                print('report_sent False')
+                if now.weekday() == 6:
+                    print('weekday 0')
+                    if now.hour == 11:
+                        print('hour 6')
+                        report_sent = True
+                        self.trigger()
+                else:
+                    pass
+
+            if report_sent is True:
+                print('report_sent True')
+                if now.weekday() == 1:
+                    print('next day')
+                    report_sent = False
+            print('sleeping')
+            time.sleep(1800)
+
+
