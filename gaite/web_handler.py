@@ -6,7 +6,7 @@ import numpy as np
 
 def get_stuff_from_url(web_url):
     try:
-        print(web_url)
+        #print(web_url)
         soup = get_soup_from_url(web_url)
         name = get_name_from_soup(soup)
         email = create_email(name)

@@ -5,12 +5,13 @@ test:
         get_analytics: True
         start_date: # YYYY-mm-dd
         end_date:  # YYYY-mm-dd
-        recruiter:
+        recruiter: [Danielle Bragge, Patti Babyn]
     emails:
-        send_emails: False
+        send_emails: True
         recipients: [joshuabragge@gmail.com]
         sent_from_address: josh@bragge.ca
         sent_from_name: Ad Impressions
+        delivery_time: [6, 6] # day of week (0-6) and hour (0-23)
     results:
         save: True
         location: results
@@ -18,14 +19,15 @@ test:
 prod:
     analytics:
         get_analytics: True
-        start_date:
-        end_date:
-        recruiter: None
+        start_date: # YYYY-mm-dd
+        end_date: # YYYY-mm-dd
+        recruiter: [Danielle Bragge, Patti Babyn]
     emails:
         send_emails: True
         recipients: []
         sent_from_address: josh@bragge.ca
         sent_from_name: Ad Impressions
+        delivery_time: [0, 6] # day of week (0-6) and hour (0-23)
     results:
         save: True
         location: results

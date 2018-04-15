@@ -12,7 +12,7 @@ def create_message(name, html_frame, env='test'):
     </p> <p>
         <span style="font-family: calibri, sans-serif; font-size: 11pt;">Happy Hunting! </span>
     </p><p>
-        <span style="font-family: calibri, sans-serif; font-size 8pt;">Congratulations, you've been chosen for beta testing! This report details the approximate number of views and applicants for jobs posted on theheadhunters.ca. Please note, if a job is no longer on the headhunters website, the statistics will not be included. All information has been pulled from Google Analytics. Please send all comments, suggestions or errors to josh@bragge.ca</span>
+        <span style="font-family: calibri, sans-serif; font-size 8pt;">Congratulations, you've been chosen for beta testing! This report details the approximate number of views and applicants for jobs posted on The Headhunters website. Please note, this does not include Indeed page views unless applicants click "View on Company Site". If a job is no longer on the headhunters website, the statistics will not be included. All information has been pulled from Google Analytics. Please send all comments, suggestions or errors to josh@bragge.ca</span>
             <br />
         </span>
     </p>'''
@@ -28,7 +28,7 @@ def create_message(name, html_frame, env='test'):
                 <span style="font-family: calibri, sans-serif; font-size: 11pt;">Happy Hunting! </span>
             </p>
             <p>
-                <span style="font-family: calibri, sans-serif; font-size 8pt;">This report details the approximate number of views and applicants for jobs posted on theheadhunters.ca. Please note, if a job is no longer on the headhunters website, the statistics will not be included. All information has been pulled from Google Analytics. Please send all comments, suggestions or errors to josh@bragge.ca</span>
+                <span style="font-family: calibri, sans-serif; font-size 8pt;">This report details the approximate number of views and applicants for jobs posted on The Headhunters website. Please note, this does not include Indeed page views unless applicants click "View on Company Site". If a job is no longer on the headhunters website, the statistics will not be included. All information has been pulled from Google Analytics. Please send all comments, suggestions or errors to josh@bragge.ca</span>
                     <br />
                 </span>
             </p>'''
