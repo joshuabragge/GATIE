@@ -5,9 +5,9 @@ test:
         get_analytics: True
         start_date: # YYYY-mm-dd
         end_date:  # YYYY-mm-dd
-        recruiter:
+        recruiter: [Allison Ford]
     emails:
-        send_emails: False
+        send_emails: True
         recipients: [joshuabragge@gmail.com]
         sent_from_address: josh@bragge.ca
         sent_from_name: Ad Impressions
@@ -18,9 +18,9 @@ test:
 prod:
     analytics:
         get_analytics: True
-        start_date:
-        end_date:
-        recruiter: None
+        start_date: # YYYY-mm-dd
+        end_date: # YYYY-mm-dd
+        recruiter: [Danielle Bragge, Patti Babyn]
     emails:
         send_emails: True
         recipients: []
