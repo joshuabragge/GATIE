@@ -4,6 +4,7 @@ import datetime
 import time
 import pandas as pd
 
+import logger
 from gaite import email_handler
 from gaite import web_handler
 from gaite import report_handler
@@ -16,23 +17,33 @@ from gaite.environment import Env
 # send master copy to management
 # add failsafe function
 # logger
+# self.load function for reading from files
+
 
 class ProcessManager(Env):
     def __init__(self, env):
+        self.logger = logger.Logger(logger_name='Manager', filename='gaite.log')
+        self.logger.logger.info('Logger Initialized..')
+
         self.shared_state = env.shared_state
 
         yaml = YAML()
         self.config = yaml.load(open('runtime.yaml', 'r'))
 
+        self.logger.logger.info('runtime.yaml loaded')
+
         # load in runtime parameters
         self.env = self.shared_state['env']
+        self.logger.logger.info('Environment Settings: {}'.format(self.env))
 
         if self.shared_state['recruiter'] is None:
             self.active_recruiters = self.config[self.env]['analytics']['recruiter']
         else:
             self.active_recruiters = []
             self.active_recruiters.append(self.shared_state['recruiter'])
-        print(self.active_recruiters)
+
+        self.logger.logger.info('Active Recruiters: {}'.format(self.active_recruiters))
+
         if self.shared_state['start_date'] is None:
             start_date = self.config[self.env]['analytics']['start_date']
         else:
@@ -43,16 +54,22 @@ class ProcessManager(Env):
         else:
             end_date = self.shared_state['end_date']
 
+
+
         # load config params
         self.save = self.config[self.env]['results']['save']
         self.to_address = self.config[self.env]['emails']['recipients']
 
         self.sent_from_address = self.config[self.env]['emails']['sent_from_address']
         self.sent_from_name = self.config[self.env]['emails']['sent_from_name']
-        print(self.sent_from_address, self.sent_from_name)
         self.from_address = self.sent_from_name + "<" + self.sent_from_address + ">"
-
         self.send_off_emails = self.config[self.env]['emails']['send_emails']
+
+        self.logger.logger.info("Sending emails: {}".format(self.send_off_emails))
+        self.logger.logger.info("Save results: {}".format(self.save))
+        self.logger.logger.info("Sending results to {}".format(self.to_address))
+        self.logger.logger.info("Sending results from {}".format(self.sent_from_address))
+        self.logger.logger.info("Sending results with name {}".format(self.sent_from_name))
 
         # initialize report params
         self.report_views = None
@@ -62,28 +79,32 @@ class ProcessManager(Env):
         self.final_report = None
         self.start_date, self.end_date = report_manager.create_date_range(start_date, end_date)
 
+        self.logger.logger.info('Analytics range from {} to {}'.format(self.start_date, self.end_date))
+
         # initialize email params
         self.names = None
         self.subject = None
         self.all_recipients = None
 
     def trigger(self):
-        #self.get_analytics_reports()
+        self.get_analytics_reports()
 
-        #if self.save:
-        #    self.save_analytics_reports()
+        if self.save:
+            self.save_analytics_reports()
 
-        #report = self.ready_reports()
-        #web_page_details = self.get_report_details(report)
+        report = self.ready_reports()
+        web_page_details = self.get_report_details(report)
 
-        #if self.save:
-        #    self.save_web_page_details()
+        if self.save:
+            self.save_web_page_details()
 
-        #final_report = self.add_report_details(report, web_page_details)
+        final_report = self.add_report_details(report, web_page_details)
 
-        #if self.save:
-        #    self.save_complete_reports()
-        final_report = self.load_complete_report()
+        if self.save:
+            self.save_complete_reports()
+
+        # final_report = self.load_complete_report()
+
         self.prepare_emails()
 
         self.send_emails(final_report)
@@ -95,8 +116,11 @@ class ProcessManager(Env):
         :return: None
         """
         analytics = report_manager.initialize_analyticsreporting()
+        self.logger.logger.info("Initializing Google Analytics")
         self.report_views = report_manager.get_weekly_views(analytics, self.start_date, self.end_date)
+        self.logger.logger.info("Grabbed View Report")
         self.report_applicants = report_manager.get_weekly_applicants(analytics, self.start_date, self.end_date)
+        self.logger.logger.info("Grabbed Applicants Report")
         return None
 
     def save_analytics_reports(self):
@@ -106,8 +130,11 @@ class ProcessManager(Env):
         """
         try:
             self.report_applicants.to_csv('weekly_applicants.csv', index=False)
+            self.logger.logger.info("Saving Reporting Applicants as weekly_applicants.csv")
             self.report_views.to_csv('weekly_views.csv', index=False)
+            self.logger.logger.info("Saving Reporting Views as weekly_views.csv")
         except:
+            self.logger.logger.error('FAILED TO SAVE ANALYTICS REPORT RESULTS')
             return False
         return True
 
@@ -141,7 +168,9 @@ class ProcessManager(Env):
     def save_web_page_details(self):
         try:
             self.web_page_details.to_csv('web_pages.csv', index=False)
+            self.logger.logger.info("Saved Web Page Scraping Results as web_pages.csv")
         except:
+            self.logger.logger.error('FAILED TO SAVE WEB PAGE SCRAPING RESULTS')
             return False
         return True
 
@@ -163,8 +192,8 @@ class ProcessManager(Env):
     def save_complete_reports(self):
         try:
             self.final_report.to_csv('job_activity_report.csv', index=False)
-            print('final report loaded')
         except:
+            self.logger.logger.error('FAILED TO SAVE COMPLETE REPORT')
             return False
         return True
 
@@ -226,32 +255,38 @@ class ProcessManager(Env):
                                                               html=email_message)
                 if self.send_off_emails:
                     email_handler.send_email(email)
-                    print('sent email')
-                print('email delivered to', to_address, employee)
+                    self.logger.logger.info('Sent email about {} to {}'.format(employee, to_address))
 
     def run(self):
         # time controller
         report_sent = False
+        sleeper = 1800
+        self.logger.logger.info("Run executed...")
+        self.logger.logger.info("Sleeping for {} seconds".format(sleeper))
         while True:
-            now = datetime.datetime.now()
+            try:
+                now = datetime.datetime.now()
 
-            if report_sent is False:
-                print('report_sent False')
-                if now.weekday() == 6:
-                    print('weekday 0')
-                    if now.hour == 11:
-                        print('hour 6')
-                        report_sent = True
-                        self.trigger()
-                else:
-                    pass
+                if report_sent is False:
 
-            if report_sent is True:
-                print('report_sent True')
-                if now.weekday() == 1:
-                    print('next day')
-                    report_sent = False
-            print('sleeping')
-            time.sleep(1800)
+                    if now.weekday() == 6:
+                        self.logger.logger.debug("Weekday {}".format(6))
+                        if now.hour == 15:
+                            self.logger.logger.debug("Hour {}".format(15))
+                            report_sent = True
+                            self.logger.logger.info("Executing Trigger")
+                            self.trigger()
+                    else:
+                        pass
+
+                if report_sent is True:
+                    if now.weekday() == 1:
+                        self.logger.logger.info("Resetting trigger...")
+                        report_sent = False
+                time.sleep(sleeper)
+            except (KeyboardInterrupt, SystemExit):
+                self.logger.logger.info("Exiting program due to KeyBoardInterrupt")
+                raise
+
 
 
