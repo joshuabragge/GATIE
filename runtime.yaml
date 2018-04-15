@@ -11,6 +11,7 @@ test:
         recipients: [joshuabragge@gmail.com]
         sent_from_address: josh@bragge.ca
         sent_from_name: Ad Impressions
+        delivery_time: [6, 15] # day of week (0-6) and hour (0-23)
     results:
         save: True
         location: results
@@ -26,6 +27,7 @@ prod:
         recipients: []
         sent_from_address: josh@bragge.ca
         sent_from_name: Ad Impressions
+        delivery_time: [0, 6] # day of week (0-6) and hour (0-23)
     results:
         save: True
         location: results

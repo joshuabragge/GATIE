@@ -54,8 +54,6 @@ class ProcessManager(Env):
         else:
             end_date = self.shared_state['end_date']
 
-
-
         # load config params
         self.save = self.config[self.env]['results']['save']
         self.to_address = self.config[self.env]['emails']['recipients']
@@ -64,6 +62,8 @@ class ProcessManager(Env):
         self.sent_from_name = self.config[self.env]['emails']['sent_from_name']
         self.from_address = self.sent_from_name + "<" + self.sent_from_address + ">"
         self.send_off_emails = self.config[self.env]['emails']['send_emails']
+
+        self.delivery_time = self.config[self.env]['emails']['delivery_time']
 
         self.logger.logger.info("Sending emails: {}".format(self.send_off_emails))
         self.logger.logger.info("Save results: {}".format(self.save))
@@ -263,16 +263,20 @@ class ProcessManager(Env):
         sleeper = 1800
         self.logger.logger.info("Run executed...")
         self.logger.logger.info("Sleeping for {} seconds".format(sleeper))
+        delivery_day = self.delivery_time[0]
+        delivery_hour = self.delivery_time[1]
+        self.logger.logger.info("Delivery on {} at {}".format(delivery_day, delivery_hour))
+
         while True:
             try:
                 now = datetime.datetime.now()
 
                 if report_sent is False:
 
-                    if now.weekday() == 6:
-                        self.logger.logger.debug("Weekday {}".format(6))
-                        if now.hour == 15:
-                            self.logger.logger.debug("Hour {}".format(15))
+                    if now.weekday() == delivery_day:
+                        self.logger.logger.debug("Weekday {}".format(delivery_day))
+                        if now.hour == delivery_hour:
+                            self.logger.logger.debug("Hour {}".format(delivery_hour))
                             report_sent = True
                             self.logger.logger.info("Executing Trigger")
                             self.trigger()
