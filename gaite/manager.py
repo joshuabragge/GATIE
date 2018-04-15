@@ -284,7 +284,7 @@ class ProcessManager(Env):
                         pass
 
                 if report_sent is True:
-                    if now.weekday() == 1:
+                    if now.weekday() == delivery_day + 1:
                         self.logger.logger.info("Resetting trigger...")
                         report_sent = False
                 time.sleep(sleeper)
