@@ -87,23 +87,23 @@ class ProcessManager(Env):
         self.all_recipients = None
 
     def trigger(self):
-        #self.get_analytics_reports()
+        self.get_analytics_reports()
 
-        #if self.save:
-            #self.save_analytics_reports()
+        if self.save:
+            self.save_analytics_reports()
 
-        #report = self.ready_reports()
-        #web_page_details = self.get_report_details(report)
+        report = self.ready_reports()
+        web_page_details = self.get_report_details(report)
 
-        #if self.save:
-         #   self.save_web_page_details()
+        if self.save:
+            self.save_web_page_details()
 
-        #final_report = self.add_report_details(report, web_page_details)
+        final_report = self.add_report_details(report, web_page_details)
 
-        #if self.save:
-            #self.save_complete_reports()
+        if self.save:
+            self.save_complete_reports()
 
-        final_report = self.load_complete_report()
+        # final_report = self.load_complete_report()
 
         self.prepare_emails()
 
